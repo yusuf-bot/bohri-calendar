@@ -5,18 +5,17 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { ArrowRight, FileDown, Calendar } from 'lucide-react';
+import { FileDown, Calendar } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
-import { convertCalendar } from '@/utils/calendarUtils';
+import { convertCalendar, generatePDF } from '@/utils/calendarUtils';
 
 const CalendarConverter = () => {
   const [calendarType, setCalendarType] = useState<'islamic' | 'georgian'>('islamic');
   const [year, setYear] = useState<string>('');
-  const [convertedYear, setConvertedYear] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  const handleConvert = async () => {
+  const handleDownload = async () => {
     if (!year || isNaN(Number(year))) {
       toast({
         title: "Invalid Year",
@@ -29,28 +28,9 @@ const CalendarConverter = () => {
     setIsLoading(true);
     try {
       // Convert the year using our utility function
-      const result = await convertCalendar(calendarType, Number(year));
-      setConvertedYear(result);
-      toast({
-        title: "Conversion Complete",
-        description: `Year converted successfully.`,
-      });
-    } catch (error) {
-      toast({
-        title: "Conversion Failed",
-        description: "There was an error converting the year. Please try again.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleDownloadPDF = async () => {
-    if (!convertedYear) return;
-
-    try {
-      // Generate and download the PDF using our utility
+      const convertedYear = await convertCalendar(calendarType, Number(year));
+      
+      // Generate and download the PDF with both years
       const pdfBlob = await generatePDF(calendarType, Number(year), convertedYear);
       
       // Create a download link and trigger it
@@ -70,9 +50,11 @@ const CalendarConverter = () => {
     } catch (error) {
       toast({
         title: "Download Failed",
-        description: "There was an error downloading the PDF. Please try again.",
+        description: "There was an error generating the PDF. Please try again.",
         variant: "destructive"
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -84,7 +66,7 @@ const CalendarConverter = () => {
         </div>
         <CardTitle className="text-xl">Time Travel PDF</CardTitle>
         <CardDescription>
-          Convert between Islamic and Georgian calendars
+          Download calendar conversion between Islamic and Georgian years
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -116,36 +98,16 @@ const CalendarConverter = () => {
             placeholder={`Enter ${calendarType} year`}
           />
         </div>
-        
-        {convertedYear && (
-          <div className="p-4 bg-secondary/30 rounded-md">
-            <p className="text-sm">
-              <span className="font-semibold">{calendarType === 'islamic' ? 'Georgian' : 'Islamic'} Year:</span> 
-              <span className="ml-2">{convertedYear}</span>
-            </p>
-          </div>
-        )}
       </CardContent>
-      <CardFooter className="flex flex-col space-y-4">
+      <CardFooter>
         <Button 
-          onClick={handleConvert} 
+          onClick={handleDownload} 
           className="w-full" 
           disabled={isLoading}
         >
-          {isLoading ? 'Converting...' : 'Convert'}
-          <ArrowRight className="ml-2 h-4 w-4" />
+          {isLoading ? 'Processing...' : 'Download PDF'}
+          <FileDown className="ml-2 h-4 w-4" />
         </Button>
-        
-        {convertedYear && (
-          <Button 
-            onClick={handleDownloadPDF}
-            variant="outline" 
-            className="w-full"
-          >
-            Download PDF
-            <FileDown className="ml-2 h-4 w-4" />
-          </Button>
-        )}
       </CardFooter>
     </Card>
   );

@@ -56,11 +56,13 @@ export const generatePDF = async (
   doc.text('Conversion Details:', 20, 50);
   
   doc.setFontSize(12);
-  const sourceLabel = sourceCalendar === 'islamic' ? 'Islamic (Hijri) Year' : 'Georgian Year';
-  const targetLabel = sourceCalendar === 'islamic' ? 'Georgian Year' : 'Islamic (Hijri) Year';
+  doc.text(`Islamic (Hijri) Year: ${sourceCalendar === 'islamic' ? originalYear : convertedYear}`, 30, 60);
+  doc.text(`Georgian Year: ${sourceCalendar === 'islamic' ? convertedYear : originalYear}`, 30, 70);
   
-  doc.text(`${sourceLabel}: ${originalYear}`, 30, 60);
-  doc.text(`${targetLabel}: ${convertedYear}`, 30, 70);
+  // Add a decorative border
+  doc.setDrawColor(155, 135, 245); // Primary purple color
+  doc.setLineWidth(0.5);
+  doc.rect(15, 40, 180, 40);
   
   doc.setFontSize(10);
   const date = new Date();

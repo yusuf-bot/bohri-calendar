@@ -7,7 +7,7 @@ const Index = () => {
       <h1 className="text-3xl font-bold mb-8 text-center">Islamic-Georgian Calendar Converter</h1>
       <CalendarConverter />
       <footer className="mt-12 text-center text-sm text-muted-foreground">
-        <p>Convert years between Islamic (Hijri) and Georgian calendars and download as PDF</p>
+        <p>Enter a year and download a PDF showing both Islamic (Hijri) and Georgian calendar years</p>
       </footer>
     </div>
   );
