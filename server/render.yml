@@ -1,9 +1,12 @@
 services:
   - type: web
-    name: calendar-service
-    env: python
-    buildCommand: pip install -r requirements.txt && playwright install --with-deps chromium
-    startCommand: python app.py
+    name: time-travel-calendar
+    runtime: python
+    buildCommand: pip install -r requirements.txt && PLAYWRIGHT_BROWSERS_PATH=0 playwright install chromium
+    startCommand: python server/app.py
     envVars:
       - key: PORT
         value: 5001
+      - key: PYTHON_VERSION
+        value: 3.9.0
+    healthCheckPath: /api/health
