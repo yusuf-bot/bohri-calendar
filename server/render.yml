@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: calendar-service
+    env: python
+    buildCommand: pip install -r requirements.txt && playwright install --with-deps chromium
+    startCommand: python app.py
+    envVars:
+      - key: PORT
+        value: 5001

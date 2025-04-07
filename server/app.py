@@ -14,9 +14,23 @@ logging.basicConfig(level=logging.DEBUG,
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
-CORS(app, resources={r"/api/*": {"origins": "*"}}, supports_credentials=True)
+CORS(app, origins="*", allow_headers=["Content-Type", "Authorization"], 
+     methods=["GET", "POST", "OPTIONS"])
+
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0  # Disable caching
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max upload
+
+@app.before_request
+def log_request_info():
+    logger.debug('Request Headers: %s', request.headers)
+    logger.debug('Request Method: %s, Path: %s', request.method, request.path)
+
+
+# Add this new endpoint
+@app.route('/api/test', methods=['GET', 'POST'])
+def test_endpoint():
+    """Simple test endpoint to verify the server is working"""
+    return jsonify({"status": "ok", "message": "Server is running correctly"}), 200
 
 @app.route('/api/calendar', methods=['POST'])
 def generate_calendar():
@@ -32,7 +46,7 @@ def generate_calendar():
             
         year = data.get('year')
         calendar_type = data.get('calendar_type', 'gregorian')
-        quality = data.get('quality', 'medium')  # Default to medium quality
+        quality = data.get('quality', 'medium')
         
         logger.info(f"Processing request for year: {year}, calendar type: {calendar_type}, quality: {quality}")
         
@@ -53,17 +67,13 @@ def generate_calendar():
         is_gregorian = calendar_type in ['gregorian', 'georgian']
         
         # Generate the calendar images and PDF
+        logger.info(f"Starting PDF generation for {year}, is_gregorian={is_gregorian}, quality={quality}")
         try:
-            logger.info(f"Starting PDF generation for {year}, is_gregorian={is_gregorian}, quality={quality}")
             pdf_filename = asyncio.run(generate_calendar_images(year, is_gregorian, quality))
             logger.info(f"PDF generation completed: {pdf_filename}")
         except Exception as e:
-            import traceback
             logger.error(f"Error in generate_calendar_images: {str(e)}")
-            logger.error(traceback.format_exc())
             return jsonify({"error": f"Failed to generate calendar: {str(e)}"}), 500
-        
-        # Rest of the function remains the same
         
         # Check if file exists
         if not os.path.exists(pdf_filename):
@@ -73,25 +83,18 @@ def generate_calendar():
         # Return the PDF as a downloadable file
         try:
             logger.info(f"Sending file: {pdf_filename}")
-            response = send_file(
+            return send_file(
                 pdf_filename,
                 as_attachment=True,
                 download_name=pdf_filename,
                 mimetype='application/pdf'
             )
-            # Add CORS headers to the response
-            response.headers.add('Access-Control-Allow-Origin', '*')
-            response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
-            response.headers.add('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-            return response
         except Exception as e:
             logger.error(f"Error sending file: {str(e)}")
             return jsonify({"error": f"Error sending file: {str(e)}"}), 500
             
     except Exception as e:
-        import traceback
         logger.error(f"Error generating calendar: {str(e)}")
-        logger.error(traceback.format_exc())
         return jsonify({"error": str(e)}), 500
 
 @app.route('/api/health', methods=['GET'])
@@ -221,5 +224,6 @@ def convert_date():
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    logger.info("Starting Flask server")
-    app.run(debug=True, host='0.0.0.0', port=5000, threaded=True)
+
+    port = int(os.environ.get('PORT', 5001))
+    app.run(host='0.0.0.0', port=port)

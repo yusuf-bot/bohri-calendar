@@ -7,10 +7,12 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { FileDown, Calendar } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { convertCalendar, generatePDF } from '@/utils/calendarUtils';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const CalendarConverter = () => {
   const [calendarType, setCalendarType] = useState<'islamic' | 'georgian'>('islamic');
   const [year, setYear] = useState<string>('');
+  const [quality, setQuality] = useState<'low' | 'medium' | 'high'>('medium');
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState('');
   const [timeRemaining, setTimeRemaining] = useState(120); // Start with 2 minutes
@@ -79,8 +81,8 @@ const CalendarConverter = () => {
     setIsLoading(true);
     
     try {
-      // Generate and download the PDF
-      const pdfBlob = await generatePDF(calendarType, Number(year));
+      // Generate and download the PDF with quality option
+      const pdfBlob = await generatePDF(calendarType, Number(year), quality);
       
       // Create a download link and trigger it
       const url = URL.createObjectURL(pdfBlob);
@@ -147,6 +149,20 @@ const CalendarConverter = () => {
                 onChange={(e) => setYear(e.target.value)}
                 type="number"
               />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="quality">Quality</Label>
+              <Select value={quality} onValueChange={(value) => setQuality(value as 'low' | 'medium' | 'high')}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select quality" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="low">Low (1080p) - Faster</SelectItem>
+                  <SelectItem value="medium">Medium (2K) - Recommended</SelectItem>
+                  <SelectItem value="high">High (4K) - May take longer</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </CardContent>
