@@ -14,8 +14,15 @@ logging.basicConfig(level=logging.DEBUG,
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
-CORS(app, origins="*", allow_headers=["Content-Type", "Authorization"], 
-     methods=["GET", "POST", "OPTIONS"])
+CORS(app, 
+     resources={r"/api/*": {
+         "origins": ["http://localhost:8080", "https://dawoodi-bohri-calendars.netlify.app"],
+         "methods": ["GET", "POST", "OPTIONS"],
+         "allow_headers": ["Content-Type", "Authorization"],
+         "supports_credentials": True
+     }},
+     supports_credentials=True
+)
 
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0  # Disable caching
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max upload
@@ -25,7 +32,22 @@ def log_request_info():
     logger.debug('Request Headers: %s', request.headers)
     logger.debug('Request Method: %s, Path: %s', request.method, request.path)
 
+# Add after the existing imports
 
+
+# Add this new endpoint for cron job
+@app.route('/api/cron', methods=['GET'])
+def cron_check():
+    """Endpoint for cron job to keep server active"""
+    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    logger.info(f"Cron job ping received at {current_time}")
+    return jsonify({
+        "status": "ok",
+        "message": "Server is active",
+        "timestamp": current_time
+    }), 200
+
+# ... rest of your code ...
 # Add this new endpoint
 @app.route('/api/test', methods=['GET', 'POST'])
 def test_endpoint():

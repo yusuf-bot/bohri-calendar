@@ -4,6 +4,11 @@
  * @param year The year to convert
  * @returns The converted year
  */
+
+/*
+const API_BASE_URL = 'https://bohri-calendar.onrender.com';
+*/
+const API_BASE_URL = 'http://localhost:5001';
 export const generatePDF = async (
   calendarType: string, 
   year: number, 
@@ -18,7 +23,7 @@ export const generatePDF = async (
 
     console.log('Attempting to generate PDF with:', { calendarType, year, quality });
     
-    const response = await fetch('https://bohri-calendar.onrender.com/api/calendar', {
+    const response = await fetch(`${API_BASE_URL}/api/calendar`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -51,7 +56,7 @@ export const generatePDF = async (
 
 export async function checkServerHealth(): Promise<boolean> {
   try {
-    const response = await fetch('https://bohri-calendar.onrender.com/api/health');
+    const response = await fetch(`${API_BASE_URL}/api/health`);
     if (!response.ok) {
       throw new Error(`Server health check failed: ${response.status}`);
     }
@@ -68,7 +73,7 @@ export const convertCalendar = async (
   year: number
 ) => {
   try {
-    const response = await fetch('https://bohri-calendar.onrender.com/api/convert', {
+    const response = await fetch(`${API_BASE_URL}/api/convert`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -100,7 +105,7 @@ export async function convertDate(
   conversionType: 'greg-to-hijri' | 'hijri-to-greg'
 ): Promise<any> {
   try {
-    const response = await fetch('https://bohri-calendar.onrender.com/api/convert-date', {
+    const response = await fetch(`${API_BASE_URL}/api/convert-date`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
