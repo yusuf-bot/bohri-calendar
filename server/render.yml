@@ -1,12 +1,10 @@
 services:
   - type: web
-    name: time-travel-calendar
-    runtime: python
-    buildCommand: pip install -r requirements.txt && PLAYWRIGHT_BROWSERS_PATH=0 playwright install chromium
-    startCommand: python server/app.py
+    name: bohri-calendar
+    env: python
+    buildCommand: ./build.sh
+    startCommand: python app.py
     envVars:
-      - key: PORT
-        value: 5001
-      - key: PYTHON_VERSION
-        value: 3.9.0
+      - key: PYTHONUNBUFFERED
+        value: true
     healthCheckPath: /api/health
