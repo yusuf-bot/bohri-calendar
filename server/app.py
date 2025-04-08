@@ -39,7 +39,7 @@ def log_request_info():
 @app.route('/api/cron', methods=['GET'])
 def cron_check():
     """Endpoint for cron job to keep server active"""
-    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     logger.info(f"Cron job ping received at {current_time}")
     return jsonify({
         "status": "ok",
