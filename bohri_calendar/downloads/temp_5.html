@@ -1,0 +1,411 @@
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>May 2024 Calendar</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                background-color: #F5F5F9;
+                margin: 0;
+                padding: 0;
+                width: 100vw;
+                height: 100vh;
+                overflow: hidden;
+            }
+            
+            .calendar-container {
+                width: 100%;
+                height: 100%;
+                margin: 0 auto;
+                padding: 1.04vw; /* 40px / 38.4 = 1.04vw */
+                box-sizing: border-box;
+                background-color: #F5F5F9;
+            }
+            
+            .calendar-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 0.78vw; /* 30px / 38.4 = 0.78vw */
+                width: 100%;
+            }
+            
+            .month-year {
+                font-size: 2.5vw; /* 96px / 38.4 = 2.5vw */
+                font-weight: bold;
+                text-align: center;
+                flex: 1;
+                margin: 0;
+            }
+            
+            .year, .islamic-month {
+                font-size: 1.88vw; /* 72px / 38.4 = 1.88vw */
+                font-weight: bold;
+                margin: 0;
+            }
+            
+            .days-header {
+                display: grid;
+                grid-template-columns: repeat(7, 1fr);
+                gap: 0.21vw; /* 8px / 38.4 = 0.21vw */
+                margin-bottom: 0.21vw; /* 8px / 38.4 = 0.21vw */
+            }
+            
+            .day-name {
+                background-color: #000;
+                color: white;
+                text-align: center;
+                padding: 0.52vw; /* 20px / 38.4 = 0.52vw */
+                border-radius: 0.52vw; /* 20px / 38.4 = 0.52vw */
+                font-weight: bold;
+                font-size: 1.09vw; /* 42px / 38.4 = 1.09vw */
+            }
+            
+            .calendar-grid {
+                display: grid;
+                grid-template-columns: repeat(7, 1fr);
+                gap: 0.21vw; /* 8px / 38.4 = 0.21vw */
+                height: 80vh; /* Added fixed height to ensure consistent layout */
+            }
+            
+            .calendar-day {
+                background-color: white;
+                min-height: 8.33vh; /* 320px / 38.4 = 8.33vw, but using vh for height */
+                border-radius: 0.13vw; /* 5px / 38.4 = 0.13vw */
+                padding: 0.39vw; /* 15px / 38.4 = 0.39vw */
+                position: relative;
+                display: flex;
+                flex-direction: column;
+            }
+            
+            .date-number {
+                display: flex;
+                justify-content: space-between;
+            }
+            
+            .gregorian {
+                font-size: 1.56vw; /* 60px / 38.4 = 1.56vw */
+                font-weight: bold;
+            }
+            
+            .hijri {
+                font-size: 1.3vw; /* 50px / 38.4 = 1.3vw */
+                font-weight: bold;
+                color: #666666;
+            }
+            
+            .event {
+                background-color: #FFE4E1;
+                color: #000;
+                padding: 0.31vw 0.63vw; /* 12px / 38.4 = 0.31vw, 24px / 38.4 = 0.63vw */
+                border-radius: 0.39vw; /* 15px / 38.4 = 0.39vw */
+                text-align: center;
+                font-size: 0.83vw; /* 32px / 38.4 = 0.83vw */
+                margin-top: 0.26vw; /* 10px / 38.4 = 0.26vw */
+            }
+        </style>
+    </head>
+    <body>
+        <div class="calendar-container">
+            <div class="calendar-header">
+                <div class="year">2024</div>
+                <div class="month-year">May</div>
+                <div class="islamic-month">Shawwal</div>
+            </div>
+            
+            <div class="days-header">
+                <div class="day-name">MON</div>
+                <div class="day-name">TUE</div>
+                <div class="day-name">WED</div>
+                <div class="day-name">THU</div>
+                <div class="day-name">FRI</div>
+                <div class="day-name">SAT</div>
+                <div class="day-name">SUN</div>
+            </div>
+            
+            <div class="calendar-grid">
+    
+                <div class="calendar-day">
+                    <div class="date-number">
+                        <span class="gregorian"></span>
+                        <span class="hijri"></span>
+                    </div>
+                </div>
+                
+                <div class="calendar-day">
+                    <div class="date-number">
+                        <span class="gregorian"></span>
+                        <span class="hijri"></span>
+                    </div>
+                </div>
+                
+                <div class="calendar-day">
+                    <div class="date-number">
+                        <span class="gregorian">1</span>
+                        <span class="hijri">23</span>
+                    </div>
+                    
+                </div>
+                
+                <div class="calendar-day">
+                    <div class="date-number">
+                        <span class="gregorian">2</span>
+                        <span class="hijri">24</span>
+                    </div>
+                    
+                </div>
+                
+                <div class="calendar-day">
+                    <div class="date-number">
+                        <span class="gregorian">3</span>
+                        <span class="hijri">25</span>
+                    </div>
+                    
+                </div>
+                
+                <div class="calendar-day">
+                    <div class="date-number">
+                        <span class="gregorian">4</span>
+                        <span class="hijri">26</span>
+                    </div>
+                    
+                </div>
+                
+                <div class="calendar-day">
+                    <div class="date-number">
+                        <span class="gregorian">5</span>
+                        <span class="hijri">27</span>
+                    </div>
+                    
+                </div>
+                
+                <div class="calendar-day">
+                    <div class="date-number">
+                        <span class="gregorian">6</span>
+                        <span class="hijri">28</span>
+                    </div>
+                    
+                </div>
+                
+                <div class="calendar-day">
+                    <div class="date-number">
+                        <span class="gregorian">7</span>
+                        <span class="hijri">29</span>
+                    </div>
+                    
+                </div>
+                
+                <div class="calendar-day">
+                    <div class="date-number">
+                        <span class="gregorian">8</span>
+                        <span class="hijri">1</span>
+                    </div>
+                    <div class="event" style="background-color:#dcebff">New Dhu al-Qadah month</div>
+                </div>
+                
+                <div class="calendar-day">
+                    <div class="date-number">
+                        <span class="gregorian">9</span>
+                        <span class="hijri">2</span>
+                    </div>
+                    
+                </div>
+                
+                <div class="calendar-day">
+                    <div class="date-number">
+                        <span class="gregorian">10</span>
+                        <span class="hijri">3</span>
+                    </div>
+                    
+                </div>
+                
+                <div class="calendar-day">
+                    <div class="date-number">
+                        <span class="gregorian">11</span>
+                        <span class="hijri">4</span>
+                    </div>
+                    
+                </div>
+                
+                <div class="calendar-day">
+                    <div class="date-number">
+                        <span class="gregorian">12</span>
+                        <span class="hijri">5</span>
+                    </div>
+                    
+                </div>
+                
+                <div class="calendar-day">
+                    <div class="date-number">
+                        <span class="gregorian">13</span>
+                        <span class="hijri">6</span>
+                    </div>
+                    
+                </div>
+                
+                <div class="calendar-day">
+                    <div class="date-number">
+                        <span class="gregorian">14</span>
+                        <span class="hijri">7</span>
+                    </div>
+                    
+                </div>
+                
+                <div class="calendar-day">
+                    <div class="date-number">
+                        <span class="gregorian">15</span>
+                        <span class="hijri">8</span>
+                    </div>
+                    
+                </div>
+                
+                <div class="calendar-day">
+                    <div class="date-number">
+                        <span class="gregorian">16</span>
+                        <span class="hijri">9</span>
+                    </div>
+                    
+                </div>
+                
+                <div class="calendar-day">
+                    <div class="date-number">
+                        <span class="gregorian">17</span>
+                        <span class="hijri">10</span>
+                    </div>
+                    
+                </div>
+                
+                <div class="calendar-day">
+                    <div class="date-number">
+                        <span class="gregorian">18</span>
+                        <span class="hijri">11</span>
+                    </div>
+                    
+                </div>
+                
+                <div class="calendar-day">
+                    <div class="date-number">
+                        <span class="gregorian">19</span>
+                        <span class="hijri">12</span>
+                    </div>
+                    
+                </div>
+                
+                <div class="calendar-day">
+                    <div class="date-number">
+                        <span class="gregorian">20</span>
+                        <span class="hijri">13</span>
+                    </div>
+                    
+                </div>
+                
+                <div class="calendar-day">
+                    <div class="date-number">
+                        <span class="gregorian">21</span>
+                        <span class="hijri">14</span>
+                    </div>
+                    
+                </div>
+                
+                <div class="calendar-day">
+                    <div class="date-number">
+                        <span class="gregorian">22</span>
+                        <span class="hijri">15</span>
+                    </div>
+                    
+                </div>
+                
+                <div class="calendar-day">
+                    <div class="date-number">
+                        <span class="gregorian">23</span>
+                        <span class="hijri">16</span>
+                    </div>
+                    
+                </div>
+                
+                <div class="calendar-day">
+                    <div class="date-number">
+                        <span class="gregorian">24</span>
+                        <span class="hijri">17</span>
+                    </div>
+                    
+                </div>
+                
+                <div class="calendar-day">
+                    <div class="date-number">
+                        <span class="gregorian">25</span>
+                        <span class="hijri">18</span>
+                    </div>
+                    
+                </div>
+                
+                <div class="calendar-day">
+                    <div class="date-number">
+                        <span class="gregorian">26</span>
+                        <span class="hijri">19</span>
+                    </div>
+                    
+                </div>
+                
+                <div class="calendar-day">
+                    <div class="date-number">
+                        <span class="gregorian">27</span>
+                        <span class="hijri">20</span>
+                    </div>
+                    
+                </div>
+                
+                <div class="calendar-day">
+                    <div class="date-number">
+                        <span class="gregorian">28</span>
+                        <span class="hijri">21</span>
+                    </div>
+                    
+                </div>
+                
+                <div class="calendar-day">
+                    <div class="date-number">
+                        <span class="gregorian">29</span>
+                        <span class="hijri">22</span>
+                    </div>
+                    
+                </div>
+                
+                <div class="calendar-day">
+                    <div class="date-number">
+                        <span class="gregorian">30</span>
+                        <span class="hijri">23</span>
+                    </div>
+                    
+                </div>
+                
+                <div class="calendar-day">
+                    <div class="date-number">
+                        <span class="gregorian">31</span>
+                        <span class="hijri">24</span>
+                    </div>
+                    
+                </div>
+                
+                <div class="calendar-day">
+                    <div class="date-number">
+                        <span class="gregorian"></span>
+                        <span class="hijri"></span>
+                    </div>
+                </div>
+                
+                <div class="calendar-day">
+                    <div class="date-number">
+                        <span class="gregorian"></span>
+                        <span class="hijri"></span>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </body>
+    </html>
+    

@@ -3,13 +3,13 @@ import os
 from playwright.async_api import async_playwright
 import calendar
 import datetime
-from calendar_converter import CustomCalendar
+from .calendar_converter import CustomCalendar
 from PIL import Image
 import io
 import time
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4, landscape
-
+from tqdm import tqdm 
 event={}
 GREGORIAN_MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 
                    'July', 'August', 'September', 'October', 'November', 'December']
@@ -274,13 +274,7 @@ async def generate_calendar_html(year, month, gregorian_events, custom_cal, is_g
 
     return complete_html
 async def generate_calendar_images(year, is_gregorian=True, quality="medium"):
-    """Generate calendar images for all months and combine into PDF
-    
-    Args:
-        year: The year to generate the calendar for
-        is_gregorian: Whether to generate a Gregorian (True) or Hijri (False) calendar
-        quality: The quality of the output - low, medium, or high
-    """
+    """Generate calendar images for all months and combine into PDF"""
     custom_cal = CustomCalendar()
     image_paths = []
     start = time.time()
@@ -307,97 +301,81 @@ async def generate_calendar_images(year, is_gregorian=True, quality="medium"):
     max_retries = 3
     retry_count = 0
     
-    # ... rest of the function remains the same ...
+    calendar_type = 'Gregorian' if is_gregorian else 'Hijri'
+    print(f"\nGenerating {calendar_type} Calendar for year {year}")
     
-    while retry_count < max_retries:
-        try:
-            # Launch browser with more resilient settings
-            async with async_playwright() as p:
-                browser = await p.chromium.launch()
-                context = await browser.new_context(
-                    viewport={'width': viewport_width, 'height': viewport_height},
-                    device_scale_factor=scale_factor
-                )
-                
-                # Create a persistent context
-                context = await browser.new_context(
-                    viewport={'width': viewport_width, 'height': viewport_height},
-                    device_scale_factor=scale_factor
-                )
-                
-                # Process each month
-                for month in range(1, 13):
-                    month_retry = 0
-                    while month_retry < 3:  # Retry each month up to 3 times
-                        try:
-                            month_name = GREGORIAN_MONTHS[month-1] if is_gregorian else CUSTOM_MONTHS[month-1]
-                            print(f"Processing {month_name}")
-                            events={}
-                            # Generate HTML content
-                            html_content = await generate_calendar_html(year, month, events, custom_cal, is_gregorian)
-                            
-                            # Save HTML to a temporary file for debugging
-                            temp_html_path = os.path.join(downloads_dir, f"temp_{month}.html")
-                            with open(temp_html_path, "w", encoding="utf-8") as f:
-                                f.write(html_content)
-                            
-                            # Create a new page
-                            page = await context.new_page()
-                            
-                            # Set viewport explicitly to be larger to ensure all content is visible
-                            await page.set_viewport_size({"width": viewport_width, "height": viewport_height})
-                            
-                            # Navigate to the file instead of using setContent
-                            file_url = f"file://{temp_html_path.replace(os.sep, '/')}"
-                            await page.goto(file_url, wait_until="networkidle")
-                            
-                            # Wait longer to ensure everything is rendered
-                            await page.wait_for_timeout(2000)
-                            
-                            # Take screenshot of the entire content, not just the viewport
-                            calendar_type = 'hijri' if not is_gregorian else 'gregorian'
-                            filename = f"calendar_{calendar_type}_{year}_{month:02d}.png"
-                            filepath = os.path.join(os.getcwd(), filename)
-                            
-                            # Take a full page screenshot to ensure we capture everything
-                            await page.screenshot(path=filepath, full_page=True)
-                            
-                            image_paths.append(filepath)
-                            print(f"Generated image for {month_name}")
-                            
-                            # Close the page to free up resources
-                            await page.close()
+    with tqdm(total=100, desc="Progress", bar_format='{l_bar}{bar:30}{r_bar}', ncols=80) as pbar:
+        while retry_count < max_retries:
+            try:
+                async with async_playwright() as p:
+                    browser = await p.chromium.launch()
+                    context = await browser.new_context(
+                        viewport={'width': viewport_width, 'height': viewport_height},
+                        device_scale_factor=scale_factor
+                    )
+                    
+                    for month in range(1, 13):
+                        month_retry = 0
+                        while month_retry < 3:
                             try:
-                                os.remove(temp_html_path)
-                            except:
-                                pass
+                                month_name = GREGORIAN_MONTHS[month-1] if is_gregorian else CUSTOM_MONTHS[month-1]
+                                events = {}
+                                html_content = await generate_calendar_html(year, month, events, custom_cal, is_gregorian)
                                 
-                            break  # Success, exit retry loop
-                            
-                        except Exception as e:
-                            print(f"Error processing month {month}: {str(e)}, attempt {month_retry+1}/3")
-                            month_retry += 1
-                            await asyncio.sleep(2)  # Wait before retry
-                            
-                            if month_retry >= 3:
-                                print(f"Failed to process month {month} after 3 attempts")
+                                # Save HTML to a temporary file
+                                temp_html_path = os.path.join(downloads_dir, f"temp_{month}.html")
+                                with open(temp_html_path, "w", encoding="utf-8") as f:
+                                    f.write(html_content)
+                                
+                                # Create a new page
+                                page = await context.new_page()
+                                await page.set_viewport_size({"width": viewport_width, "height": viewport_height})
+                                
+                                # Navigate to the file
+                                file_url = f"file://{temp_html_path.replace(os.sep, '/')}"
+                                await page.goto(file_url, wait_until="networkidle")
+                                await page.wait_for_timeout(2000)
+                                
+                                # Take screenshot
+                                calendar_type = 'hijri' if not is_gregorian else 'gregorian'
+                                filename = f"calendar_{calendar_type}_{year}_{month:02d}.png"
+                                filepath = os.path.join(os.getcwd(), filename)
+                                await page.screenshot(path=filepath, full_page=True)
+                                
+                                image_paths.append(filepath)
+                                await page.close()
+                                
+                                try:
+                                    os.remove(temp_html_path)
+                                except:
+                                    pass
+                                
+                                # Update progress (8% per month)
+                                pbar.update(8)
+                                break
+                                
+                            except Exception as e:
+                                print(f"\nError processing {month_name}: {str(e)}, attempt {month_retry+1}/3")
+                                month_retry += 1
+                                await asyncio.sleep(2)
+                                
+                                if month_retry >= 3:
+                                    print(f"\nFailed to process month {month} after 3 attempts")
+                    
+                    await browser.close()
+                    pbar.update(4)  # Final 4% for completion
+                    break
+                    
+            except Exception as e:
+                print(f"\nBrowser error (attempt {retry_count+1}/{max_retries}): {str(e)}")
+                retry_count += 1
+                await asyncio.sleep(5)
                 
-                # Close the browser after all months are processed
-                await browser.close()
-                
-                # If we got here without exceptions, break out of the retry loop
-                break
-                
-        except Exception as e:
-            print(f"Browser error (attempt {retry_count+1}/{max_retries}): {str(e)}")
-            retry_count += 1
-            await asyncio.sleep(5)  # Wait 5 seconds before retrying
-            
-            if retry_count >= max_retries:
-                print("Maximum retries reached, giving up")
-                raise Exception(f"Failed to generate calendar images after {max_retries} attempts: {str(e)}")
+                if retry_count >= max_retries:
+                    print("Maximum retries reached, giving up")
+                    raise Exception(f"Failed to generate calendar images after {max_retries} attempts: {str(e)}")
     
-    print(f"Image generation time: {time.time()-start:.2f} seconds")
+    print(f"\nImage generation time: {time.time()-start:.2f} seconds")
     
     if not image_paths:
         raise Exception("Failed to generate any calendar images")
