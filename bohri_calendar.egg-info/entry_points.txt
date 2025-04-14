@@ -1,0 +1,2 @@
+[console_scripts]
+bohri-calendar = bohri_calendar.cli:main
