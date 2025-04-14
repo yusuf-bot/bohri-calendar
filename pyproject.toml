@@ -25,4 +25,8 @@ dependencies = [
 
 [project.urls]
 "Homepage" = "https://github.com/yusuf-bot/bohri-calendar"
-"Bug Tracker" = "https://github.com/yusuf-bot/bohri-calendar/issues"
+
+packages = ["src"]
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

@@ -1,0 +1,33 @@
+Metadata-Version: 2.4
+Name: bohri_calendar
+Version: 0.1.0
+Summary: A Bohri Calendar conversion and PDF generation library
+Author-email: yusuf-bot <yusuff.0279@gmail.com>
+License-Expression: MIT
+Project-URL: Homepage, https://github.com/yusuf-bot/bohri-calendar
+Project-URL: Bug Tracker, https://github.com/yusuf-bot/bohri-calendar/issues
+Classifier: Programming Language :: Python :: 3
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+Requires-Dist: playwright
+Requires-Dist: Pillow
+Requires-Dist: reportlab
+Requires-Dist: asyncio
+
+# Time Travel PDF
+
+A Python library for converting between Gregorian and Dawoodi Bohra calendars and generating beautiful PDF calendars.
+
+## Features
+
+- Convert dates between Gregorian and Dawoodi Bohra calendars
+- Generate PDF calendars for both calendar systems
+- Include important events and celebrations
+- Support for different quality settings in PDF generation
+
+## Installation
+
+```bash
+pip install dawoodi-bohra-calendar
+```
