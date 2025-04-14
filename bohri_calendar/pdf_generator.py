@@ -3,14 +3,14 @@ import os
 from playwright.async_api import async_playwright
 import calendar
 import datetime
-from custom_calendar import CustomCalendar
+from calendar_converter import CustomCalendar
 from PIL import Image
 import io
 import time
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4, landscape
 
-
+event={}
 GREGORIAN_MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 
                    'July', 'August', 'September', 'October', 'November', 'December']
 CUSTOM_MONTHS = [
@@ -43,7 +43,7 @@ async def generate_calendar_html(year, month, gregorian_events, custom_cal, is_g
     else:
         # For Hijri calendar
         month_name = CUSTOM_MONTHS[month-1]
-        print(month_name)
+    
         # Get month days before generating calendar
         month_days = custom_cal.get_month_days(month_name, year)
         cal = custom_cal.get_month_calendar(year, month)  # Fix: month-1 as index
@@ -220,12 +220,6 @@ async def generate_calendar_html(year, month, gregorian_events, custom_cal, is_g
                         day_events.extend(gregorian_events[islamic_key])
                     if islamic_day == 1:
                         day_events.extend([f"New {islamic_month} month"])
-                    if islamic_day>=23 and islamic_day<30 and islamic_month=="Ramadan":
-                        if Thursday:
-                            day_events.extend(["Nabi Na Naam"])
-                        elif current_date.weekday()==3:
-                            Thursday = True
-                            day_events.extend(["Nabi Na Naam"])
                             
                 else:
                     # For Hijri calendar
@@ -242,7 +236,6 @@ async def generate_calendar_html(year, month, gregorian_events, custom_cal, is_g
                     # Check for Gregorian events on this date
                     greg_key = f"@{current_date.day}-{current_date.month}"
                     if greg_key in gregorian_events:
-                        print(gregorian_events[greg_key])
                         day_events.extend(gregorian_events[greg_key])
                     if current_date.day == 1:
                         day_events.extend([f"New {GREGORIAN_MONTHS[current_date.month-1]} month"])
@@ -250,7 +243,7 @@ async def generate_calendar_html(year, month, gregorian_events, custom_cal, is_g
                 events_html = ""
                 for event in day_events:
                     if event:
-                        event_color=get_event_color(event)  # Only add non-empty events
+                        event_color="#dcebff"
                         events_html += f'<div class="event" style="background-color:{event_color}">{event}</div>'
 
                 complete_html += f'''
@@ -339,7 +332,7 @@ async def generate_calendar_images(year, is_gregorian=True, quality="medium"):
                         try:
                             month_name = GREGORIAN_MONTHS[month-1] if is_gregorian else CUSTOM_MONTHS[month-1]
                             print(f"Processing {month_name}")
-                            
+                            events={}
                             # Generate HTML content
                             html_content = await generate_calendar_html(year, month, events, custom_cal, is_gregorian)
                             
@@ -491,11 +484,11 @@ def create_pdf_from_images(image_paths, year, is_gregorian):
     time.sleep(1)
     
     # Clean up individual image files
-    """for img_path in image_paths:
+    for img_path in image_paths:
         try:
             os.remove(img_path)
         except Exception as e:
-            print(f"Warning: Could not remove {img_path}: {e}")"""
+            print(f"Warning: Could not remove {img_path}: {e}")
     
     print("Removed individual image files")
 
